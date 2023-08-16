@@ -1,0 +1,114 @@
+#!/bin/sh
+
+MGR_DIR=/usr/csmuser/cuffe/apps/procServMgr
+CONFIG_DIR=$MGR_DIR/etc
+CONFIG_FILE="$CONFIG_DIR/procServ.conf"
+
+HOSTNAME='/bin/hostname'
+HOST=`$HOSTNAME`
+
+function parseconfig() {
+i=0
+e=0
+d=0
+h=0
+while read  iocname computer port status
+do
+   if [ "`echo $iocname | cut -c1`" = "#" ] ; then
+      # Skip comments
+      continue
+   fi
+   if [ "`echo $iocname | cut -c1`" = "" ] ; then
+      # Skip blank lines
+      continue
+   fi
+
+    #print $(eval echo \$${ioc}_port) 
+   export ${iocname}_host=$computer    
+   export ${iocname}_port=$port
+   
+   #export ${iocname}_status=$options
+   
+   iocs[$i]=$iocname
+   ((i=i+1)) 
+   
+   case $status in
+   	enable|enabled|on)
+		iocs_enabled[$e]=$iocname  
+		((e=e+1))
+		export ${iocname}_status=enabled
+	;;
+	*)
+		iocs_disabled[$d]=$iocname   
+		((d=d+1))
+		export ${iocname}_status=disabled
+   esac
+    
+   if [ "$computer" = "$HOST" ] ; then
+   iocs_host[$h]=$iocname
+   ((h=h+1))
+   fi
+   
+done < $CONFIG_FILE
+
+}
+
+function printconfig() {
+
+echo "All IOCS"
+echo "--------"
+for i in ${iocs[*]}
+do
+#echo IOC configured STATUS to run HOST:PORT
+echo "$i $(eval echo \$${i}_status) to run on $(eval echo \$${i}_host):$(eval echo \$${i}_port)"
+done
+
+
+if [ "${iocs_enabled[*]}" != "" ]; then
+
+echo ""
+echo "Enabled IOCS"
+echo "------------"
+for i in ${iocs_enabled[*]}
+do
+echo "$i configured to run on $(eval echo \$${i}_host):$(eval echo \$${i}_port)"
+
+done
+
+fi
+
+
+if [ "${iocs_disabled[*]}" != "" ]; then
+echo ""
+echo "Disabled IOCS"
+echo "-------------"
+for i in ${iocs_disabled[*]}
+do
+echo "$i configured to not run on $(eval echo \$${i}_host):$(eval echo \$${i}_port)"
+done
+echo ""
+fi
+}
+
+function printhostconfig() {
+	
+	echo "IOC CONFIGURED FOR $HOST"
+	echo "--------------------------"
+	
+	if [ "${iocs_host[*]}" != "" ]; then
+		for i in ${iocs_host[*]}
+		do
+		#echo IOC configured STATUS to run HOST:PORT
+		echo "$i $(eval echo \$${i}_status) to run on $(eval echo \$${i}_host):$(eval echo \$${i}_port)"
+		done
+	else
+		echo "No iocs are configured to run on $HOST"	
+	fi
+
+echo ""
+}	
+
+parseconfig
+printconfig
+
+printhostconfig
