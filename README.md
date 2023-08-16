@@ -18,7 +18,7 @@ procServMgr is intended to be a control script for running "soft" iocs with proc
     Provided by the EPICS distribution - https://epics.anl.gov/download/index.php
 
 ## procServMgr configuration file
-The standard configuration file read by procServMgr is procServ.conf. You can overide this on the command line if you want to test an alternate configuation or the file is in a different place (like a DEV environment). The file is self documenting.
+The standard configuration file read by procServMgr is procServ.conf. You can overide this on the command line if you want to test an alternate configuation or the file is in a different place (like a DEV environment). The file is self documenting. 
 
 ```
 # procServ.conf
