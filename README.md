@@ -29,8 +29,10 @@ The standard configuration file read by procServMgr is procServ.conf. You can ov
 # Help
 #-------------------
 # procServMgr is self documenting with the help option:
-#  procServMgr -h
+#    procServMgr -h
 #
+# procServ has it's own man page:
+#    man procServ
 #
 #-------------------
 # Valid Hosts
