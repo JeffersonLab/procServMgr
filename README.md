@@ -37,17 +37,11 @@ The standard configuration file read by procServMgr is procServ.conf. You can ov
 #-------------------
 # Valid Hosts
 #-------------------
-# Valid opsbat hosts where procServMg is running in this environemnt: 
-# opsbat0  7WS
-# opsbat1  6WS
-# opsbat2  7WS
-# opsbat3  6WS
-# opsbat4  6WS
-# opsbat5  7WS
-# opsbat6  7WS
-# opsbat7  7WS
-# opsbat8  9WS
-# opsbat9  9WS
+# Valid opsbat hosts where procServMg is running in this fiefdom: 
+# host0  RHEL 7WS
+# host1  RHEL 6WS
+# host2  RHEL 7WS
+# host3  RHEL 9WS
 # 
 #-------------------
 # Testing
@@ -88,20 +82,9 @@ The standard configuration file read by procServMgr is procServ.conf. You can ov
 #-------          :--------     :-----   :-------        :----------------               :---------------
 #iocname          :hostname     :port    :status         :procServ options               :startup options
 #-------          :--------     :-----   :-------        :----------------               :---------------
-
-### opsbat3, RHEL6 ###
-iocsofthrtbt      :opsbat3      :20000   :enabled        :                               :
-#iocsoftmesrq     :opsbat3      :20001   :enabled        :                               :              
-iocsoftbsy1       :opsbat3      :20004   :enabled        :                               :
-#iocsoftinj6      :opsbat3      :20016   :enabled        :                               :
-iocsofthlapps     :opsbat3      :20044   :disabled       :                               :
-
-### opsbat9, RHEL9 ###
-iocsoftmag         :opsbat9     :20000   :enabled        :-L /cs/op/iocs/iocsoftmag/log  :
-
-iocsoftihvwa1     :opsbat3      :20023   :enabled        :                               :-x guest@129.57.203.22
-iocsoftihvbs1     :opsbat3      :20024   :enabled        :                               :-x guest@129.57.203.23
-iocsoftihvhd1     :opsbat3      :20025   :enabled        :                               :-x guest@129.57.203.26
+iocsofthrtbt 	:host0		:20000	:disabled	:-L /tmp/iocsoftthrtbt.log	:-x test options
+iocsofthrtbt2	:host1		:20001	:disabled	:-L /tmp/iocsoftthrtbt2.log     :-x @test 	
+iocsoftlemtest	:host3		:20003	:enabled	:-L /tmp/iocsoftlemtest.log     :                         
 ```
 
 ## Installation
