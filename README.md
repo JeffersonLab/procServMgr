@@ -192,7 +192,7 @@ iocsoftinjdec      :opsbat9      :20001   :enabled        :                     
 ```
 ### **Create a cron entry to run as the _SCRIPT_USER_.**
 
-Ordinarily, procServMgr runs as and individual user via cron. This might be different depending on the environment. You need to consider this when creating the crontab entry.
+Ordinarily, procServMgr runs as and individual user via cron. This might be different depending on the environment.  You could run it manually or as a daemon for example.
 
 The standard cron entry runs procServMgr every 5 minutes. This may need to be reduced depending on the circumstances. The PATH variable also needs to be modified to add the location of caRepeater if it is not in the standard PATH.
 
