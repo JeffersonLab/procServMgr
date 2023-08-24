@@ -9,7 +9,7 @@ procServMgr is intended to be a control script for running "soft" iocs with proc
 ## Dependencies
 
 - **ksh** - Korn Shell<br/>
-    Ususally provided by the the pdksh or ksh packages
+    Typcially provided by the the pdksh or ksh packages
 
 - **procServ**<br/>
     Project Page for procServ - https://sourceforge.net/projects/procserv
@@ -17,8 +17,32 @@ procServMgr is intended to be a control script for running "soft" iocs with proc
 - **caRepeater**<br/>
     Provided by the EPICS distribution - https://epics.anl.gov/download/index.php
 
+## Installation
+
+There are only two files required for procServMgr to run. The procServMgr script itself and the config file procServ.conf. There is also a script to connect to running softIOCs (softioc_console but this is not required.
+
+1. Modify the proServMgr and softioc_console files and update the following variables to match your installation.
+```
+     SCRIPT_USER=someuser           - user that softIOC processes will run as.
+     IOC_DIR=/cs/iocs               - Path to where the softIOC directories are stored.
+     APP_DIR=/opt/procServ          - Path to procServ installation.
+     CONFIG_DIR=$IOC_DIR/procServ   - Path to the directory containing the procServ.conf config file.
+
+     You may also need to update the start command to match your environment.
+```
+2. Modify the provided procServ.conf file to suit your neeeds.  Note that the field separators are ":" and should not be modified.
+Example:
+```
+#-------          :--------     :-----   :-------        :----------------               :---------------
+#iocname          :hostname     :port    :status         :procServ options               :startup options
+#-------          :--------     :-----   :-------        :----------------               :---------------
+iocsoftmag         :opsbat9      :20000   :enabled        :-L /cs/op/iocs/iocsoftmag/log  :
+iocsoftinjdec      :opsbat9      :20001   :enabled        :                               :
+
+```
+
 ## procServMgr configuration file
-The standard configuration file read by procServMgr is procServ.conf. You can overide this on the command line if you want to test an alternate configuation or the file is in a different place (like a DEV environment). The file is self documenting. 
+The standard configuration file read by procServMgr is procServ.conf. You can overide this on the command line if you want to test an alternate configuation or the file is in a different place (like a DEV environment). The file is self documenting.
 
 ```
 # procServ.conf
@@ -87,28 +111,6 @@ iocsofthrtbt2	:host1		:20001	:disabled	:-L /tmp/iocsoftthrtbt2.log     :-x @test
 iocsoftlemtest	:host3		:20003	:enabled	:-L /tmp/iocsoftlemtest.log     :                         
 ```
 
-## Installation
-
-THere are only two files required for procServMgr to run. The procServMgr script itself and the config file procServ.conf
-
-1. Modify the proServMgr file and update the following variables to match your installation.
-```
-     SCRIPT_USER=someuser           - user that softIOC processes will run as.
-     IOC_DIR=/cs/iocs               - Path to where the softIOC directories are stored.
-     APP_DIR=/opt/procServ          - Path to procServ installation.
-     CONFIG_DIR=$IOC_DIR/procServ   - Path to the directory containing the procServ.conf config file.
-```
-2. Modify the provided procServ.conf file to suit your neeeds.  Note that the field separators are ":" and should not be modified.
-Example:
-```
-#-------          :--------     :-----   :-------        :----------------               :---------------
-#iocname          :hostname     :port    :status         :procServ options               :startup options
-#-------          :--------     :-----   :-------        :----------------               :---------------
-iocsoftmag         :opsbat9      :20000   :enabled        :-L /cs/op/iocs/iocsoftmag/log  :
-iocsoftinjdec      :opsbat9      :20001   :enabled        :                               :
-
-```
-
 ## Usage
 ```
 usage: procServMgr [-h] [-i iocname] [-c cfg_file] [-d ioc_dir]
@@ -167,7 +169,27 @@ softioc_console iocsofthrt - start a console on ioc iocsofthrt
 ```
 ## Setting Up ProcServMgr on a Host
 
-1. **Create a cron entry to run as the _SCRIPT_USER_.**
+### **Install the distribuition***
+The procServMgr scripts and config file can be installed anywhere.  You just need to update the scripts for the proper location.  The procServ.conf file is normally placed in a common NFS share so that it can be used on multiple systems.
+
+
+This is a common unix style layout for the installation. 
+```
+procServMgr/
+├── 2.7
+│   ├── bin
+│   │   ├── parse_config
+│   │   ├── procServMgr
+│   │   └── softioc_console
+│   └── etc
+│       └── procServ.conf 
+├── bin -> pro/bin
+├── etc -> pro/etc
+├── pro -> 2.7
+
+```
+
+### **Create a cron entry to run as the _SCRIPT_USER_.**
 
 Ordinarily, procServMgr runs as and individual user via cron. This might be different depending on the environment. You need to consider this when creating the crontab entry.
 
@@ -182,9 +204,9 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/csite/pubtools/bin:/cs/prohome/bin
 */5 * * * * someuser /usr/csite/pubtools/procServ/pro/bin/procServMgr check >> /cs/op/iocs/procServ/logs/softioc_`hostname`.log 2>&1
 ```
 
-2.  **Raise the Limits for Number of Processes Per User**
+###  **Raise the Limits for Number of Processes Per User**
 
-The default limits on the number of processes/threads a standard user can run concurrently can cause problems as all soft IOCs are run as the same user. Raise the limits from 1024 to 8192. You must change it in the following two locations for a RHEL style system.
+The default limits on the number of processes/threads a standard user can run concurrently can cause problems as all soft IOCs are run as the same user. Raise the limits from 1024 to at least 8192. You must change it in the following two locations for a RHEL style system.
 
 Note: To get a sense of the current number of processes/threads that are being run by vxuser, run this command.
 
@@ -206,7 +228,7 @@ sudo vi /etc/security/limits.d/95-procserv.conf
 *          soft    nproc     8192
 ```
 
-3. **Fix UDP Name Resolution with Firewall Rules**
+### **Fix UDP Name Resolution with Firewall Rules**
 
 Running multiple IOCs on one host has an annoying side effect: Clients that are using that host's IP address in their EPICS_CA_ADDR_LIST with EPICS_CA_AUTO_ADDR_LIST=NO will only reach one of the IOCs - usually the one that was started last. All clients have to use broadcasts to reach all IOCs.
 
@@ -222,7 +244,7 @@ A simple and effective trick to deliver messages to all IOCs instead of one is t
    chkconfig iptables on
 # Start iptables
    service iptables start
-# Clar all rules first
+# Clear all rules first
    iptables -F
    iptables -X
    iptables -t nat -F
@@ -241,6 +263,7 @@ A simple and effective trick to deliver messages to all IOCs instead of one is t
 **RHEL 9**
 
 ```
+# Disable firewalld
 systemctl stop firewalld
 systemctl disable firewalld
 systemctl mask firewalld
@@ -250,7 +273,7 @@ dnf install -y iptables-services iptables-utils``
    chkconfig iptables on
 # Start iptables
    service iptables start
-# Clar all rules first
+# Clear all rules first
    iptables -F
    iptables -X
    iptables -t nat -F
@@ -266,7 +289,6 @@ dnf install -y iptables-services iptables-utils``
    iptables-save > /etc/sysconfig/iptables
 
 ```
-
 
 ## License
 MIT.
