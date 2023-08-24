@@ -17,30 +17,6 @@ procServMgr is intended to be a control script for running "soft" iocs with proc
 - **caRepeater**<br/>
     Provided by the EPICS distribution - https://epics.anl.gov/download/index.php
 
-## Installation
-
-There are only two files required for procServMgr to run. The procServMgr script itself and the config file procServ.conf. There is also a script to connect to running softIOCs (softioc_console but this is not required.
-
-1. Modify the proServMgr and softioc_console files and update the following variables to match your installation.
-```
-     SCRIPT_USER=someuser           - user that softIOC processes will run as.
-     IOC_DIR=/cs/iocs               - Path to where the softIOC directories are stored.
-     APP_DIR=/opt/procServ          - Path to procServ installation.
-     CONFIG_DIR=$IOC_DIR/procServ   - Path to the directory containing the procServ.conf config file.
-
-     You may also need to update the start command to match your environment.
-```
-2. Modify the provided procServ.conf file to suit your neeeds.  Note that the field separators are ":" and should not be modified.
-Example:
-```
-#-------          :--------     :-----   :-------        :----------------               :---------------
-#iocname          :hostname     :port    :status         :procServ options               :startup options
-#-------          :--------     :-----   :-------        :----------------               :---------------
-iocsoftmag         :opsbat9      :20000   :enabled        :-L /cs/op/iocs/iocsoftmag/log  :
-iocsoftinjdec      :opsbat9      :20001   :enabled        :                               :
-
-```
-
 ## procServMgr configuration file
 The standard configuration file read by procServMgr is procServ.conf. You can overide this on the command line if you want to test an alternate configuation or the file is in a different place (like a DEV environment). The file is self documenting.
 
@@ -123,7 +99,9 @@ usage: procServMgr [-h] [-i iocname] [-c cfg_file] [-d ioc_dir]
 
 start      - start iocs specified in config file
 stop       - stop iocs specified in config file
-check      - start any iocs not running that are configured to run
+check      - start any iocs not running that are configured to run and
+             stop any iocs that are running but disabled in the config file.
+
 restart    - stop and start iocs specified in config file
 status     - dump a short status screen showing current status
 test       - show how each IOC would be invoked but don't do anything
@@ -134,7 +112,7 @@ procServMgr stop   - stop all iocs enabled in the config file
 procServMgr status - show status for all iocs
 procServMgr -c /tmp/testconfig.conf check - use alternate config file
 procServMgr -i iocsofthrt start - start ioc iocsofthrt only
-procServMgr -i iocsofthrt test - show  start command for iocsofthrt
+procServMgr -i iocsofthrt test - show start command for iocsofthrt
 
 CONFIGURATION FILES:
 --------------------
@@ -169,7 +147,7 @@ softioc_console iocsofthrt - start a console on ioc iocsofthrt
 ```
 ## Setting Up ProcServMgr on a Host
 
-### **Install the distribuition***
+### **Install the distribuition**
 The procServMgr scripts and config file can be installed anywhere.  You just need to update the scripts for the proper location.  The procServ.conf file is normally placed in a common NFS share so that it can be used on multiple systems.
 
 
@@ -188,7 +166,30 @@ procServMgr/
 ├── pro -> 2.7
 
 ```
+## Update the Configuration to your Environment
 
+There are only two files required for procServMgr to run. The procServMgr script itself and the config file procServ.conf. There is also a script to connect to running softIOCs (softioc_console) but this is not required.
+
+1. Modify the proServMgr and softioc_console files and update the following variables to match your installation.
+```
+     SCRIPT_USER=someuser           - user that softIOC processes will run as.
+     IOC_DIR=/cs/iocs               - Path to where the softIOC directories are stored.
+     APP_DIR=/opt/procServ          - Path to procServ installation.
+     CONFIG_DIR=$IOC_DIR/procServ   - Path to the directory containing the procServ.conf config file.
+
+     You may also need to update the start command to match your environment.
+
+```
+2. Modify the provided procServ.conf file to suit your neeeds.  Note that the field separators are ":" and should not be modified.
+Example:
+```
+#-------          :--------     :-----   :-------        :----------------               :---------------
+#iocname          :hostname     :port    :status         :procServ options               :startup options
+#-------          :--------     :-----   :-------        :----------------               :---------------
+iocsoftmag         :opsbat9      :20000   :enabled        :-L /cs/op/iocs/iocsoftmag/log  :
+iocsoftinjdec      :opsbat9      :20001   :enabled        :                               :
+
+```
 ### **Create a cron entry to run as the _SCRIPT_USER_.**
 
 Ordinarily, procServMgr runs as and individual user via cron. This might be different depending on the environment. You need to consider this when creating the crontab entry.
