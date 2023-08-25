@@ -166,7 +166,7 @@ procServMgr/
 ├── pro -> 2.7
 
 ```
-## Update the Configuration to your Environment
+### Update the Configuration to your Environment
 
 There are only two files required for procServMgr to run. The procServMgr script itself and the config file procServ.conf. There is also a script to connect to running softIOCs (softioc_console) but this is not required.
 
