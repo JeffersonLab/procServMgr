@@ -295,4 +295,4 @@ dnf install -y iptables-services iptables-utils``
 MIT.
 
 ## Project status
-procSrvMgr has been in use since 2008 with only minor fixes.  Is is still being improved and devloped.
+procSrvMgr has been in use since 2008 with only minor fixes.  Is is still being improved and developed.
