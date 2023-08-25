@@ -268,7 +268,7 @@ A simple and effective trick to deliver messages to all IOCs instead of one is t
 systemctl stop firewalld
 systemctl disable firewalld
 systemctl mask firewalld
-dnf install -y iptables-services iptables-utils``
+dnf install -y iptables-services iptables-utils
 
 # Enable iptables
    chkconfig iptables on
